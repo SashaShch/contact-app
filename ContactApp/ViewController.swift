@@ -21,6 +21,41 @@ class ViewController: UIViewController {
         contacts = contacts.sorted{ $0.0 < $1.0 }
     }
     
+    func showAlertDeleteContact(at indexPath: Int) {
+        
+        let alertNextController = UIAlertController(title: nil, message: "Delete this contact?", preferredStyle: .alert)
+        let actionDeleteContact = UIAlertAction(title: "Delete", style: .default){ (action:UIAlertAction) in
+            self.contacts.remove(at: indexPath)
+            self.contactTableView.reloadData()
+            
+        }
+        let actionCancel = UIAlertAction(title: "Cancel", style: .cancel)
+        
+        alertNextController.addAction(actionDeleteContact)
+        alertNextController.addAction(actionCancel)
+        present(alertNextController, animated: true, completion: nil)
+    }
+    
+    func showAlertAboutContact(at indexPath: Int) {
+        let alertController = UIAlertController(title: nil, message: "\(contacts[indexPath].0)", preferredStyle: .alert)
+        
+        
+        let actionOpen = UIAlertAction(title: "Open", style: .default) { (action:UIAlertAction) in
+            if let vc = self.storyboard?.instantiateViewController(identifier: "Additional Info"){
+                self.navigationController?.pushViewController(vc, animated: true)
+            }
+        }
+        
+        let actionDelete = UIAlertAction(title: "Delete", style: .default) { (action:UIAlertAction) in
+            self.showAlertDeleteContact(at: indexPath)
+        }
+        
+        alertController.addAction(actionOpen)
+        alertController.addAction(actionDelete)
+        
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
     @IBAction func addButtonPressed(_ sender: Any) {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "New Contact Controller") {
             if let newContactViewController = vc as? NewContactViewController {
@@ -52,9 +87,8 @@ extension ViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView,
                    didSelectRowAt indexPath: IndexPath) {
         
-        if let vc = self.storyboard?.instantiateViewController(identifier: "Additional Info"){
-            navigationController?.pushViewController(vc, animated: true)
-        }
+        showAlertAboutContact(at: indexPath.item)
+        
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
